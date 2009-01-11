@@ -30,7 +30,7 @@ FILENAME_COMPOSE_LOOKASIDE = 'gtk-compose-lookaside.txt'
 
 # We currently support keysyms of size 2; once upstream xorg gets sorted, 
 # we might produce some tables with size 2 and some with size 4.
-SIZEOFINT = 2
+SIZEOFINT = 4
 
 # Current max compose sequence length; in case it gets increased.
 WIDTHOFCOMPOSETABLE = 5
