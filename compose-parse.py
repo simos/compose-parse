@@ -610,7 +610,6 @@ for line in xorg_compose_sequences_raw:
 	if line is "" or match("^XCOMM", line) or match("^#", line):
 		continue
 
-	line = line[:-1]
 	components = split(':', line)
 	if len(components) != 2:
 		print "Invalid line %(linenum_compose)d in %(filename)s: No sequence\

@@ -1,12 +1,12 @@
-# 
-# This file contains the compose sequences that GTK+ used to have until GTK+ 2.12
-# but are not found anymore at the upstream Compose file at X.Org.
-# When updating gtkimcontextsimpleseqs.h with compose-parse.py,
-# we include this file as well. There are 15 conflicts currently
-# in the compose sequences, and we currently favour the sequences from 
-# this file (against the upstream X.Org file). For more, see
-# http://bugzilla.gnome.org/show_bug.cgi?id=557420
-#
+XCOMM 
+XCOMM This file contains the compose sequences that GTK+ used to have until GTK+ 2.12
+XCOMM but are not found anymore at the upstream Compose file at X.Org.
+XCOMM When updating gtkimcontextsimpleseqs.h with compose-parse.py,
+XCOMM we include this file as well. There are 15 conflicts currently
+XCOMM in the compose sequences, and we currently favour the sequences from 
+XCOMM this file (against the upstream X.Org file). For more, see
+XCOMM http://bugzilla.gnome.org/show_bug.cgi?id=557420
+XCOMM
 
 <Greek_accentdieresis> <Greek_iota> 		: "ἴ" U0390
 <Greek_accentdieresis> <Greek_upsilon>		: "ΐ" U03B0
