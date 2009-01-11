@@ -1156,15 +1156,15 @@ if opt_statistics:
 	print "Not algorithmic (stats from Xorg Compose file)"
 	print "Number of sequences                                        :", len(xorg_compose_sequences) 
 	print "Flat array looks like                                      :", len(xorg_compose_sequences), "rows of 6 integers (2 bytes per int, or 12 bytes per row)"
-	print "Flat array would have taken up (in bytes)                  :", num_entries * 2 * 6, "bytes from the GTK+ library"
+	print "Flat array would have taken up (in bytes)                  :", num_entries * 4 * 6, "bytes from the GTK+ library"
 	print "Number of items in flat array                              :", len(xorg_compose_sequences) * 6
 	print "  of which are zeroes                                      :", zeroes, "or ", (100 * zeroes) / (len(xorg_compose_sequences) * 6), " per cent"
 	print "Number of different first items                            :", num_first_keysyms
-	print "Number of max bytes (if using flat array)                  :", num_entries * 2 * 6
-	print "Number of savings                                          :", zeroes * 2 - num_first_keysyms * 2 * 5
+	print "Number of max bytes (if using flat array)                  :", num_entries * 4 * 6
+	print "Number of savings                                          :", zeroes * 4 - num_first_keysyms * 4 * 5
 	print 
 	print "Memory needs if both algorithmic+optimised table in latest Xorg compose file"
-	print "                                                           :", num_entries * 2 * 6 - zeroes * 2 + num_first_keysyms * 2 * 5
+	print "                                                           :", num_entries * 4 * 6 - zeroes * 4 + num_first_keysyms * 4 * 5
 	print
 	print "Old implementation in GTK+"
 	print "Number of sequences in old gtkimcontextsimple.c            :", 691
