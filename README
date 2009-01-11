@@ -1,0 +1,8 @@
+This repository contains the compose-parse.py script that parses 
+the http://gitweb.freedesktop.org/?p=xorg/lib/libX11.git;a=blob_plain;f=nls/en_US.UTF-8/Compose.pre
+file and creates a compose table version suitable for GTK+.
+The same script also allows for housekeeping tasks of the compose tables.
+This script can also be found at 
+http://svn.gnome.org/viewvc/gtk+/trunk/gtk/compose-parse.py
+
+Author: Simos Xenitellis
