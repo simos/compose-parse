@@ -352,9 +352,8 @@ def process_gdkkeysymsh():
 	#keysymdb['dead_stroke'] = 0x338
 
 	""" This is for a missing keysym from the currently upstream file """
-	"""
-	keysymdb['dead_belowring'] 	= 0x323
 	keysymdb['dead_belowdiaeresis'] = 0x324
+	keysymdb['dead_belowring'] 	= 0x325
 	keysymdb['dead_belowcomma'] 	= 0x326
 	keysymdb['dead_belowcircumflex']= 0x32d
 	keysymdb['dead_belowbreve'] 	= 0x32e
@@ -377,7 +376,6 @@ def process_gdkkeysymsh():
 	keysymdb['KP_8']          	= 0x038
 	keysymdb['KP_9']          	= 0x039
 	keysymdb['KP_Equal']      	= 0x03d
-	"""
 	""" This is^Wwas preferential treatment for Greek """
 	# keysymdb['dead_tilde'] = 0x342  		
 	""" This is^was preferential treatment for Greek """
@@ -424,8 +422,8 @@ def process_keysymstxt():
 
 	""" Patch up the keysymdb with some of our own stuff """
 	""" This is for a missing keysym from the currently upstream file """
-	keysymdb['dead_belowring'] 	= 0x323
 	keysymdb['dead_belowdiaeresis'] = 0x324
+	keysymdb['dead_belowring'] 	= 0x325
 	keysymdb['dead_belowcomma'] 	= 0x326
 	keysymdb['dead_belowcircumflex']= 0x32d
 	keysymdb['dead_belowbreve'] 	= 0x32e
@@ -591,7 +589,7 @@ try:
 except IOError, (errno, strerror):
 	if not opt_quiet:
 		print "I/O error(%s): %s" % (errno, strerror)
-		print "Did not find the lookaside compose file. Continuing..."
+		print "Did not find the lookaside compose file %s. Continuing..." % (FILENAME_LOOKASIDE)
 except:
         print "Unexpected error: ", sys.exc_info()[0]
         sys.exit(-1)
