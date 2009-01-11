@@ -470,12 +470,12 @@ def process_keysymstxt():
 	keysymdb['Oslash'] = 0x0d8		
 
 	""" This is for a missing (recently added) keysym """
-	#keysymdb['dead_psili'] = 0x313		
+	keysymdb['dead_psili'] = 0x313		
 	""" This is for a missing (recently added) keysym """
-	#keysymdb['dead_dasia'] = 0x314		
+	keysymdb['dead_dasia'] = 0x314		
 
 	""" Allows to import Multi_key sequences """
-	#keysymdb['Multi_key'] = 0xff20
+	keysymdb['Multi_key'] = 0xff20
 
 	""" New keysym (no corresponding Unicode character) """
 	#keysymdb['dead_currency'] = 0xfe6f
