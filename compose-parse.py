@@ -359,6 +359,7 @@ def process_gdkkeysymsh():
 	keysymdb['dead_belowbreve'] 	= 0x32e
 	keysymdb['dead_belowtilde'] 	= 0x330
 	keysymdb['dead_belowmacron'] 	= 0x331
+	"""
 	keysymdb['KP_Multiply']   	= 0x02a
 	keysymdb['KP_Add']        	= 0x02b
 	keysymdb['KP_Separator']  	= 0x02c
@@ -376,6 +377,7 @@ def process_gdkkeysymsh():
 	keysymdb['KP_8']          	= 0x038
 	keysymdb['KP_9']          	= 0x039
 	keysymdb['KP_Equal']      	= 0x03d
+	"""
 	""" This is^Wwas preferential treatment for Greek """
 	# keysymdb['dead_tilde'] = 0x342  		
 	""" This is^was preferential treatment for Greek """
@@ -429,6 +431,7 @@ def process_keysymstxt():
 	keysymdb['dead_belowbreve'] 	= 0x32e
 	keysymdb['dead_belowtilde'] 	= 0x330
 	keysymdb['dead_belowmacron'] 	= 0x331
+	"""
 	keysymdb['KP_Multiply']   	= 0x02a
 	keysymdb['KP_Add']        	= 0x02b
 	keysymdb['KP_Separator']  	= 0x02c
@@ -446,7 +449,7 @@ def process_keysymstxt():
 	keysymdb['KP_8']          	= 0x038
 	keysymdb['KP_9']          	= 0x039
 	keysymdb['KP_Equal']      	= 0x03d
-
+	"""
 	""" This is preferential treatment for Greek """
 	""" => we get more savings if used for Greek """
 	# keysymdb['dead_tilde'] = 0x342  		
