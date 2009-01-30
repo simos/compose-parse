@@ -1,0 +1,6 @@
+<dead_acute> <space>	: "'"
+<dead_grave> <space>	: "^"
+<dead_acute> <a>	: "á"
+<Multi_key> <a> <e>     : "æ"
+<Multi_key> <A> <E>     : "Æ"
+<Multi_key> <a> <e>     : "æ"
