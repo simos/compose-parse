@@ -27,6 +27,7 @@ URL_GDKKEYSYMSH = 'http://svn.gnome.org/svn/gtk%2B/trunk/gdk/gdkkeysyms.h'
 URL_UNICODEDATATXT = 'http://www.unicode.org/Public/5.0.0/ucd/UnicodeData.txt'
 URL_GTKOLDSEQUENCES = 'http://simos.info/pub/GTKOLDSEQUENCES.txt'
 FILENAME_COMPOSE_LOOKASIDE = 'gtk-compose-lookaside.txt'
+FILENAME_COMPOSE_WIN32 = 'gtk-win32-sequences.txt'
 
 # We currently support keysyms of size 2; once upstream xorg gets sorted, 
 # we might produce some tables with size 2 and some with size 4.
@@ -44,7 +45,7 @@ multisequence_maxseqlen = 0
 multisequence_maxvallen = 0
 
 headerfile_start = """/* GTK - The GIMP Tool Kit
- * Copyright (C) 2007, 2008 GNOME Foundation
+ * Copyright (C) 2007, 2008, 2009 GNOME Foundation
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -77,7 +78,7 @@ headerfile_start = """/* GTK - The GIMP Tool Kit
  */
 
 /*
- * Modified by the GTK+ Team and others 2007, 2008.  See the AUTHORS
+ * Modified by the GTK+ Team and others 2007, 2008, 2009.  See the AUTHORS
  * file for a list of people on the GTK+ Team.  See the ChangeLog
  * files for a list of changes.  These files are distributed with
  * GTK+ at ftp://ftp.gtk.org/pub/gtk/.
@@ -119,7 +120,7 @@ headerfile_end = """};
 """
 
 multipleseqs_file_start = """/* GTK - The GIMP Tool Kit
- * Copyright (C) 2007, 2008 GNOME Foundation
+ * Copyright (C) 2007, 2008, 2009 GNOME Foundation
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -154,6 +155,40 @@ static const guint16 gtk_compose_seqs_multi[] = {"""
 
 multipleseqs_file_end = """};
 """
+
+
+
+win32seqs_file_start = """/* GTK - The GIMP Tool Kit
+ * Copyright (C) 2007, 2008, 2009 GNOME Foundation
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the
+ * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
+ * Boston, MA 02111-1307, USA.
+ */
+
+/* This file is gtkimcontextsimplewin32seqs.h.
+ * This table is for compose sequences to be used on Win32 systems.
+ * These sequences where extracted from the file gtk-win32-sequences.txt
+ * This file was generated with http://svn.gnome.org/svn/gtk+/trunk/gtk/compose-parse.py
+ */
+"""
+
+win32seqs_file_middle = """static const guint16 gtk_compose_seqs_win32[] = {"""
+
+win32seqs_file_end = """};
+"""
+
 
 
 def stringtohex(str): return atoi(str, 16)
@@ -202,6 +237,7 @@ def usage():
 	-s, --statistics	show overall statistics (both algorithmic, non-algorithmic)
 	-u, --unicodedatatxt	show compose sequences derived from UnicodeData.txt (from unicode.org)
 	-w, --warnings		show some non-fatal warnings (useful for maintainer)
+            --win32             process gtk-win32-sequences.txt and produce gtkimcontextsimplewin32seqs.h
 
 	Default is to show statistics.
 	"""
@@ -210,7 +246,7 @@ try:
 	opts, args = getopt.getopt(sys.argv[1:], "aeghmnpqrsuw", 
 		[ "algorithmic", "gtk-expanded", "gtk", "help", "multiple",
 		  "numeric", "plane1", "quiet", "regression", 
-		  "stats", "statistics", "unicodedatatxt", "warnings"])
+		  "stats", "statistics", "unicodedatatxt", "warnings", "win32"])
 except: 
 	usage()
 	sys.exit(2)
@@ -226,6 +262,7 @@ opt_regression = False
 opt_statistics = False
 opt_unicodedatatxt = False
 opt_warnings = False
+opt_win32 = False
 
 no_options = True
 
@@ -264,6 +301,9 @@ for o, a in opts:
 		no_options = False
 	if o in ("-w", "--warnings"):
 		opt_warnings = True
+	if o in ("--win32"):
+		opt_win32 = True
+		no_options = False
 
 if no_options:
 	opt_statistics = True
@@ -565,13 +605,145 @@ def check_if_sequence_exists(allsequences, seq):
 			for i in range(seq_len - 1):
 				if seq[i] != s[i]:
 					return False
-			if i == seq_len - 1:
+			if i == seq_len - 2:
 				return True
 	return False
 
 keysymunicodedatabase = process_keysymstxt()
 keysymdatabase = process_gdkkeysymsh()
 gtkoldsequences = process_gtkoldsequences()
+
+print
+
+if opt_win32:
+	""" Process the compose sequences in gtk-win32-sequences.txt
+	""" 
+	try:
+		composefile_win32 = open(FILENAME_COMPOSE_WIN32, 'r')
+	except IOError, (errno, strerror):
+		if not opt_quiet:
+			print "I/O error(%s): %s" % (errno, strerror)
+			print "Did not find the win32 compose file %s. Exiting..." % (FILENAME_COMPOSE_WIN32)
+	except:
+	        print "Unexpected error: ", sys.exc_info()[0]
+	        sys.exit(-1)
+
+	""" Parse the compose file in xorg_compose_sequences_win32 """
+	xorg_compose_sequences_win32 = []
+	xorg_compose_sequences_win32_algorithmic = []
+
+	linenum_compose = 0
+	for line in composefile_win32.readlines():
+		linenum_compose += 1
+		line = line.strip()
+		if line is "" or match("^XCOMM", line) or match("^#", line):
+			continue
+
+		components = split(':', line)
+		if len(components) != 2:
+			print "Invalid line %(linenum_compose)d in %(filename)s: No sequence\
+			/value pair found" % { "linenum_compose": linenum_compose, "filename": FILENAME_COMPOSE_WIN32 }
+			exit(-1)
+		(seq, val ) = split(':', line)
+		seq = seq.strip()
+		val = val.strip()
+		raw_sequence = findall('\w+', seq)
+		values = split('\s+', val)
+		unichar_temp = split('"', values[0])
+		unichar = unichar_temp[1]
+		try:
+			codepointstr = values[1]
+		except IndexError:
+			codepointstr = 'U' + str(ord(unichar.decode('utf-8')[0]))
+		if raw_sequence[0][0] == 'U' and match('[0-9a-fA-F]+$', raw_sequence[0][1:]):
+			raw_sequence[0] = '0x' + raw_sequence[0][1:]
+		if codepointstr[0] == 'U' and match('[0-9a-fA-F]+$', codepointstr[1:]):
+			codepoint = atoi(codepointstr[1:], 16)
+		elif keysymunicodedatabase.has_key(codepointstr):
+			try: 
+				if keysymdatabase[codepointstr] != keysymunicodedatabase[codepointstr]:
+					if opt_warnings:
+						print "DIFFERENCE (nonfatal): 0x%(a)X 0x%(b)X" % { "a": keysymdatabase[codepointstr], 
+										"b": keysymunicodedatabase[codepointstr]},
+						print raw_sequence, codepointstr
+				else:
+					codepoint = keysymunicodedatabase[codepointstr]
+			except KeyError:
+				if opt_warnings:
+					print "KEYERROR (nonfatal): ", codepointstr
+				codepoint = keysymunicodedatabase[codepointstr]
+		else:
+			print
+			print "Invalid codepoint %(cp)s at line %(linenum_compose)d in %(filename)s:\
+			 %(line)s" % { "cp": codepointstr, "linenum_compose": linenum_compose, "filename": FILENAME_COMPOSE_WIN32, "line": line }
+			exit(-1)
+		sequence = rename_combining(raw_sequence)
+		""" This is temporary filtering, because we need to get an updated Compose file with less sequences """
+		if "Multi_key" not in sequence:
+			""" Ignore for now >0xFFFF keysyms """
+			if codepoint < 0xFFFF:
+				original_sequence = copy(sequence)
+				stats_sequence = copy(sequence)
+				base = sequence.pop()
+				basechar = keysymvalue(base, FILENAME_COMPOSE_WIN32, linenum_compose)
+				
+				if basechar < 0xFFFF:
+					counter = 1
+					unisequence = []
+					not_normalised = True
+					skipping_this = False
+					for i in range(0, len(sequence)):
+						bc = basechar
+						unisequence.append(unichr(keysymunicodevalue(sequence.pop(), FILENAME_COMPOSE_WIN32, linenum_compose)))
+						
+					if skipping_this:
+						unisequence = []
+					for perm in all_permutations(unisequence):
+						# print counter, original_sequence, unichr(basechar) + "".join(perm)
+						# print counter, map(unichr, perm)
+						normalized = normalize('NFC', unichr(basechar) + "".join(perm))
+						if len(normalized) == 1:
+							# print 'Base: %(base)s [%(basechar)s], produces [%(unichar)s] (0x%(codepoint)04X)' \
+							# % { "base": base, "basechar": unichr(basechar), "unichar": unichar, "codepoint": codepoint },
+							# print "Normalized: [%(normalized)s] SUCCESS %(c)d" % { "normalized": normalized, "c": counter }
+							stats_sequence_data = map(keysymunicodevalue, stats_sequence)
+							stats_sequence_data.append(normalized)
+							xorg_compose_sequences_win32_algorithmic.append(stats_sequence_data)
+							not_normalised = False
+							break;
+						counter += 1
+					if not_normalised:
+						original_sequence.append(codepoint)
+						if check_if_sequence_exists(xorg_compose_sequences_win32, original_sequence):
+							if not opt_quiet:
+								print "WARNING: Got duplicate sequence:", original_sequence
+						xorg_compose_sequences_win32.append(original_sequence)
+					else:
+						print "INFO: Sequence was normalised, thus not including:", original_sequence
+				else:
+					print "Error in base char !?!"
+					exit(-2)
+			else:
+				print "OVER", sequence
+				exit(-1)
+		else:
+			sequence.append(codepoint)
+			if check_if_sequence_exists(xorg_compose_sequences_win32, sequence):
+				if not opt_quiet:
+					print "WARNING: Got duplicate sequence:", sequence
+			else: 
+				xorg_compose_sequences_win32.append(sequence)
+
+	print win32seqs_file_start
+	print win32seqs_file_middle
+	for seq in xorg_compose_sequences_win32:
+		for sym in seq[:-1]:
+			print "%18s" % ("GDK_%(sym)s, " % { "sym": sym }),
+		for i in range(len(seq[:-1]), 5):
+			print "%18s" % "",
+		print "0x%(codepoint)04d, " % { "codepoint": seq[-1] }
+	print win32seqs_file_end
+	exit(0)
 
 """ Grab and open the compose file from upstream """
 filename_compose = download_file(URL_COMPOSE)
@@ -596,6 +768,7 @@ except IOError, (errno, strerror):
 except:
         print "Unexpected error: ", sys.exc_info()[0]
         sys.exit(-1)
+
 
 xorg_compose_sequences_raw = []
 for seq in composefile.readlines():
@@ -731,7 +904,7 @@ for line in xorg_compose_sequences_raw:
 					original_sequence.append(codepoint)
 					if check_if_sequence_exists(xorg_compose_sequences, original_sequence):
 						if not opt_quiet:
-							print "Got duplicate sequence:", original_sequence
+							print "WARNING: Got duplicate sequence:", original_sequence
 					xorg_compose_sequences.append(original_sequence)
 					""" print xorg_compose_sequences[-1] """
 					
@@ -745,7 +918,7 @@ for line in xorg_compose_sequences_raw:
 		sequence.append(codepoint)
 		if check_if_sequence_exists(xorg_compose_sequences, sequence):
 			if not opt_quiet:
-				print "Got duplicate sequence:", sequence
+				print "WARNING: Got duplicate sequence:", sequence
 		xorg_compose_sequences.append(sequence)
 		""" print xorg_compose_sequences[-1] """
 
@@ -1122,6 +1295,7 @@ if opt_regression:
 def convert_unotation_to_hex(var):
 	return "0x%04X" % atoi(var[1:], 16)
 
+
 if opt_multiple:
 	print multipleseqs_file_start
 	print "static const gint compose_multi_max_sequence_len = %d;" % multisequence_maxseqlen
@@ -1141,6 +1315,7 @@ if opt_multiple:
 			print '     0,',
 		print
 	print multipleseqs_file_end
+	exit(0)
 
 if opt_statistics:
 	print
